@@ -1,0 +1,37 @@
+/* Paleta, tipografía y medidas oficiales (Guía de Componentes del diseño). */
+:root {
+  /* Paleta */
+  --crema: #F9F1E4;
+  --crema-a: #FBF5EA;   /* solo en degradados de tarjetas */
+  --crema-b: #F1E8D9;   /* solo en degradados de tarjetas */
+  --vino: #4B0710;
+  --vino-oscuro: #3B0209;
+  --vino-brillo: #5A0A15; /* solo en degradados del vino */
+  --titulo: #640511;
+  --rojo: #A81528;
+  --dorado: #B7873A;
+  --dorado-50: rgba(183, 135, 58, .55);
+
+  /* Tipografías */
+  --f-anton: Anton, Impact, 'Arial Narrow', sans-serif;
+  --f-script: 'Great Vibes', 'Brush Script MT', cursive;
+  --f-cuerpo: Poppins, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --f-serif: 'Cormorant Garamond', Georgia, serif;
+
+  /* Unidades escalables: --m = 1px a 390 de ancho (diseño móvil, tope 1.5px);
+     --u = 1px a 1440 de ancho (diseño escritorio, tope 1px). cqw = ancho de .pagina. */
+  --m: min(0.2564103cqw, 1.5px);
+  --u: min(0.0694444cqw, 1px);
+
+  /* Medidas */
+  --margen: 24px;
+  --barra-h: 76px;
+  --radio-tarjeta: 24px;
+}
+
+@media (min-width: 1100px) {
+  :root {
+    --margen: calc(80 * var(--u));
+    --barra-h: 88px;
+  }
+}

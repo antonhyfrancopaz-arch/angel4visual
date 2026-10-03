@@ -1,0 +1,154 @@
+/* Fase 3 — Animaciones guiadas por scroll. CSS propio, sin librerías.
+   Respeta la CSP (sin estilos en línea) y `prefers-reduced-motion`. */
+
+/* ---------- Cámara (#que-hago): overflow:clip en vez de hidden ----------
+   Necesario en los dos tamaños de pantalla para que el sticky funcione
+   (ver plan: .escena tiene overflow:hidden, que rompe position:sticky). */
+#que-hago.escena {
+  overflow: clip;
+}
+
+/* ---------- Cámara — móvil: solo el marco se fija, el texto sigue en flujo ---------- */
+@media (max-width: 1099.98px) and (prefers-reduced-motion: no-preference) {
+  #que-hago.escena { display: grid; padding: 48px 0 24px; }
+  #que-hago.escena::before,
+  #que-hago.escena::after,
+  #que-hago .escena__foto {
+    grid-area: 1 / 1; align-self: start; position: sticky; inset: auto; top: 0; height: 100svh;
+  }
+  #que-hago .escena__degr-abajo {
+    grid-area: 1 / 1; align-self: start; position: sticky; bottom: auto;
+    top: calc(100svh - 180px); height: 180px;
+  }
+  #que-hago .escena__in { grid-area: 1 / 1; width: 100%; padding: 0 24px; }
+  #que-hago .camara__pin { height: 280svh; }
+  #que-hago .camara__marco {
+    position: sticky;
+    top: max(var(--barra-h), calc((100svh - min(320px, 40svh)) / 2));
+    height: min(320px, 40svh);
+  }
+}
+
+/* ---------- Cámara — escritorio: tarjeta completa fija + fondo en grid ---------- */
+@media (min-width: 1100px) and (prefers-reduced-motion: no-preference) {
+  #que-hago.escena {
+    display: grid;
+    grid-template-rows: 300svh;
+    height: 300svh;
+    padding: 0;
+  }
+  #que-hago.escena::before,
+  #que-hago.escena::after,
+  #que-hago .escena__foto {
+    grid-area: 1 / 1;
+    align-self: start;
+    position: sticky;
+    inset: auto;
+    top: 0;
+    height: 100svh;
+  }
+  #que-hago .escena__degr-abajo {
+    grid-area: 1 / 1;
+    align-self: start;
+    position: sticky;
+    bottom: auto;
+    top: calc(100svh - 180px);
+    height: 180px;
+  }
+  #que-hago .escena__in {
+    grid-area: 1 / 1;
+    align-self: start;
+    position: sticky;
+    top: max(var(--barra-h), calc((100svh - calc(520 * var(--u))) / 2));
+    padding: 0 var(--margen);
+    width: 100%;
+  }
+
+  #que-hago .camara__pin { display: contents; }
+
+  .camara__texto.js-camara-activo {
+    display: grid;
+  }
+  .camara__texto.js-camara-activo .camara__paso {
+    grid-area: 1 / 1;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity .5s ease;
+  }
+  .camara__texto.js-camara-activo .camara__paso.es-visible {
+    opacity: 1;
+    visibility: visible;
+  }
+}
+
+/* ---------- Portada: fundido + desenfoque de entrada, parallax leve ---------- */
+.js-animaciones [data-animar="titulo"],
+.js-animaciones [data-animar="mujer"] {
+  opacity: 0;
+  filter: blur(8px);
+  transition: opacity .8s ease, filter .8s ease;
+}
+.js-animaciones [data-animar="titulo"].animar--visible,
+.js-animaciones [data-animar="mujer"].animar--visible {
+  opacity: 1;
+  filter: blur(0);
+}
+.portada__mujer {
+  transform: translateX(-50%) translateY(var(--parallax, 0px));
+}
+
+/* ---------- Aparición escalonada genérica (data-animar, salvo cámara/portada) ----------
+   La cámara (desktop, sin reduced-motion) cruza sus 3 textos con la regla
+   de arriba (.js-camara-activo); en el resto de casos (móvil o
+   reduced-motion) los 3 .camara__paso usan esta misma aparición simple. */
+.js-animaciones [data-animar]:not([data-animar="camara"]):not([data-animar="titulo"]):not([data-animar="mujer"]),
+.js-animaciones .camara__texto:not(.js-camara-activo) .camara__paso {
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity .6s ease, transform .6s ease;
+}
+.js-animaciones [data-animar]:not([data-animar="camara"]):not([data-animar="titulo"]):not([data-animar="mujer"]).animar--visible,
+.js-animaciones .camara__texto:not(.js-camara-activo) .camara__paso.animar--visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+.proyectos__grid .tarjeta:nth-child(2) { transition-delay: .06s; }
+.proyectos__grid .tarjeta:nth-child(3) { transition-delay: .12s; }
+.proyectos__grid .tarjeta:nth-child(4) { transition-delay: .18s; }
+.proyectos__grid .tarjeta:nth-child(5) { transition-delay: .24s; }
+.proyectos__grid .tarjeta:nth-child(6) { transition-delay: .3s; }
+.asi__pasos .paso:nth-child(2) { transition-delay: .06s; }
+.asi__pasos .paso:nth-child(3) { transition-delay: .12s; }
+.asi__pasos .paso:nth-child(4) { transition-delay: .18s; }
+.asi__pasos .paso:nth-child(5) { transition-delay: .24s; }
+.extras__lista .extra:nth-child(2) { transition-delay: .06s; }
+.extras__lista .extra:nth-child(3) { transition-delay: .12s; }
+.extras__lista .extra:nth-child(4) { transition-delay: .18s; }
+
+/* ---------- Videos insertados por JS (data-video) ---------- */
+[data-video] video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* ---------- Hovers sutiles ---------- */
+.btn {
+  transition: transform .25s ease, box-shadow .25s ease;
+}
+.btn:hover,
+.btn:focus-visible {
+  transform: translateY(-2px);
+}
+#proyectos .tarjeta {
+  transition: opacity .6s ease, transform .3s ease, box-shadow .3s ease;
+}
+#proyectos .tarjeta.reveal-listo {
+  transition-delay: 0s;
+}
+.tarjeta:hover,
+.tarjeta:focus-within {
+  transform: translateY(-4px);
+}
