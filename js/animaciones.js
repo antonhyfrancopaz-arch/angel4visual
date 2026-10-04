@@ -125,24 +125,27 @@
       return plantillaActiva().replace('{n}', numero);
     };
 
-    // Precarga progresiva (f01 primero), sin bloquear la carga inicial.
-    var frameAPrecargar = 1;
-    var precargarSiguiente = function () {
-      if (frameAPrecargar > totalFrames) return;
-      var img = new Image();
-      var siguiente = function () {
-        frameAPrecargar++;
-        if ('requestIdleCallback' in window) {
-          window.requestIdleCallback(precargarSiguiente, { timeout: 500 });
-        } else {
-          window.setTimeout(precargarSiguiente, 60);
-        }
+    // Precarga en paralelo (6 a la vez), solo la plantilla activa; las Image se guardan para que no se descarten.
+    var framesCache = [];
+    var plantillaPrecargada = null;
+    var precargarFrames = function () {
+      var plantilla = plantillaActiva();
+      if (plantilla === plantillaPrecargada) return;
+      plantillaPrecargada = plantilla;
+      framesCache = [];
+      var siguiente = 1;
+      var lanzar = function () {
+        if (plantilla !== plantillaPrecargada || siguiente > totalFrames) return;
+        var n = siguiente++;
+        var img = new Image();
+        framesCache[n] = img;
+        img.src = plantilla.replace('{n}', String(n).padStart(2, '0'));
+        img.decode().catch(function () {}).then(lanzar);
       };
-      img.onload = siguiente;
-      img.onerror = siguiente;
-      img.src = rutaFrame(frameAPrecargar);
+      for (var k = 0; k < 6; k++) lanzar();
     };
-    precargarSiguiente();
+    precargarFrames();
+    mqlEscritorio.addEventListener('change', precargarFrames);
 
     var frameActual = -1;
     var aplicarFrame = function (progreso) {
